@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>WebGL - Meyroja Jovancha</title>
+
+        <link rel="stylesheet" href="css/style.css">
+        
+    </head>
+    <body>
+        <header>
+            <h1>WebGL - 3D</h1>
+        </header>
+        <main>
+            <nav class="panel panel__objects">
+                <ul>
+                    <li>
+                        <div class="panel__objects__object" data-shape="tetra">Tetra</div>
+                    </li>
+                    <li>
+                        <div class="panel__objects__object" data-shape="carpet">Carpet</div>
+                    </li>
+                    <li>
+                        <div class="panel__objects__object" data-shape="egg">Egg</div>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="panel">
+                <canvas id="canvas" width="750" height="550" ></canvas>
+            </div>
+
+            <div class="panel panel__control">
+                <fieldset class="panel__control__group">
+                    <legend>Sumbu Rotasi</legend>
+                    <label for="axisX">Sumbu X</label>
+                    <input id="axisX" class="rotate" data-axis="x" type="checkbox"/>
+                    <br/>
+                    <label for="axisY">Sumbu Y</label>
+                    <input id="axisY" class="rotate" data-axis="y" type="checkbox" checked/>
+                    <br/>
+                    <label for="axisZ">Sumbu Z</label>
+                    <input id="axisZ" class="rotate" data-axis="z" type="checkbox"/>
+                </fieldset>
+                <fieldset class="panel__control__group">
+                    <legend>Animasi</legend>
+                    <label for="speed">Kecepatan</label>
+                    <input id="speed" class="range" type="range" value="0.001" min="0" max="0.05" step="0.0001"/>
+                    <label for="zoom">Volume</label>
+                    <input id="zoom" class="range" type="range" value="-25" min="-70" max="-10" step="1"/>
+                </fieldset>
+                <fieldset class="panel__control__group panel__control__group_carpet">
+                    <legend>Variabel Karpet</legend>
+                    <label for="inherit">inherit</label>
+                    <input id="inherit" class="range range_carpet" type="range" value="2" min="1" max="4" step="1"/>
+                    <label for="dispersion">dispersion</label>
+                    <input id="dispersion" class="range range_carpet" type="range" value="20" min="0" max="100" step="0"/>
+                </fieldset>
+            </div>
+
+            <div class="error"></div>
+        </main>
+        
+
+        <script src="js/matrix.js"></script>
+        <script src="js/shapes/tetra.js"></script>
+        <script src="js/shapes/carpet.js"></script>
+        <script src="js/shapes/egg.js"></script>
+        <script src="js/script.js"></script>
+    </body>
+</html>
