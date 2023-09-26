@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <title>Interactive Animation</title>
+  <script id="vertex-shader" type="x-shader/x-vertex">
+      attribute vec4 vPosition;
+      attribute vec4 vColor;
+      attribute vec4 vNormal;
+      attribute vec2 vTexCoord;
+
+      varying vec4 fColor;
+      varying vec3 N, L, E;
+      varying vec2 fTexCoord;
+
+      uniform mat4 modelViewMatrix;
+      uniform mat4 projectionMatrix;
+      uniform mat3 normalMatrix;
+      uniform vec4 lightPosition;
+
+      void main()
+      {
+          fColor = vColor;
+          fTexCoord = vTexCoord;
+          vec3 pos = -(modelViewMatrix * vPosition).xyz;
+          if (lightPosition.z == 0.0) L = normalize(lightPosition.xyz);
+          else L = normalize(lightPosition).xyz - pos;
+          E = -normalize(pos);
+          N = normalize(normalMatrix * vNormal.xyz);
+          gl_Position = projectionMatrix * modelViewMatrix * vPosition;
+      }
+    </script>
+  <script id="fragment-shader" type="x-shader/x-fragment">
+      precision mediump float;
+
+      varying vec4 fColor;
+      varying vec3 N, L, E;
+      varying vec2 fTexCoord;
+      uniform sampler2D texture;
+
+      uniform vec4 ambientProduct;
+      uniform vec4 diffuseProduct;
+      uniform vec4 specularProduct;
+      uniform float shininess;
+
+      void main()
+      {
+        vec4 fColor;
+
+        vec3 H = normalize(L + E);
+        vec4 ambient = ambientProduct;
+
+        float Kd = max(dot(L, N), 0.0);
+        vec4 diffuse = Kd * diffuseProduct;
+
+        float Ks = pow(max(dot(N, H), 0.0), shininess);
+        vec4 specular = Ks * specularProduct;
+
+        if (dot(L, N) < 0.0) specular = vec4(0.0, 0.0, 0.0, 1.0);
+
+        fColor = ambient + diffuse + specular;
+        fColor.a = 1.0;
+        gl_FragColor = fColor * (texture2D(texture, fTexCoord));
+      }
+    </script>
+  <script type="text/javascript" src="Common/webgl-utils.js"></script>
+  <script type="text/javascript" src="Common/initShaders.js"></script>
+  <script type="text/javascript" src="Common/MV.js"></script>
+  <script type="text/javascript" src="js/index.js"></script>
+  <script type="text/javascript" src="js/main.js"></script>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+  <div class="container">
+    <canvas id="gl-canvas" width="650" height="512">
+      Oops ... your browser doesn't support the HTML5 canvas element
+    </canvas>
+    <div class="menu">
+      <div class="menu-content">
+        <div class="menu-content-title">Controls</div>
+        <p style="text-align: left;">
+          Press ENTER key to start/stop all animations.<br /><br />
+          Use ARROW keys to rotate the shapes.</p>
+        <br />
+        <div class="menu-content-title" hidden>Cube</div>
+        <div class="menu-content-group" hidden>
+          <input type="button" data-shape="cube" data-direction="up" class="menu-content-button-group direction-input"
+            value="UP" />
+          <input type="button" data-shape="cube" data-direction="down" class="menu-content-button-group direction-input"
+            value="DOWN" />
+          <input type="button" data-shape="cube" data-direction="left" class="menu-content-button-group direction-input"
+            value="LEFT" />
+          <input type="button" data-shape="cube" data-direction="right"
+            class="menu-content-button-group direction-input" value="RIGHT" /><br />
+          <input type="button" data-shape="cube" class="menu-content-start-stop-group animation-input"
+            value="START" /><br />
+          <select name="texture" data-shape="cube" class="menu-content-dropdown-group texture-input">
+            <option value="0">Silver</option>
+            <option value="1">Earth</option>
+            <option value="2">USM</option>
+            <option value="3">Charmander</option>
+            <option value="4">Chikorita</option>
+            <option value="5">Totodile</option>
+          </select>
+        </div>
+        <div class="menu-content-title" hidden>Sphere</div>
+        <div class="menu-content-group" hidden>
+          <input type="button" data-shape="sphere" data-direction="up" class="menu-content-button-group direction-input"
+            value="UP" />
+          <input type="button" data-shape="sphere" data-direction="down"
+            class="menu-content-button-group direction-input" value="DOWN" />
+          <input type="button" data-shape="sphere" data-direction="left"
+            class="menu-content-button-group direction-input" value="LEFT" />
+          <input type="button" data-shape="sphere" data-direction="right"
+            class="menu-content-button-group direction-input" value="RIGHT" /><br />
+          <input type="button" data-shape="sphere" class="menu-content-start-stop-group animation-input"
+            value="START" /><br />
+          <select name="texture" data-shape="sphere" class="menu-content-dropdown-group texture-input">
+            <option value="0">Silver</option>
+            <option value="1">Earth</option>
+            <option value="2">USM</option>
+            <option value="3">Charmander</option>
+            <option value="4">Chikorita</option>
+            <option value="5">Totodile</option>
+          </select>
+        </div>
+        <div class="menu-content-title">Tetrahedron</div>
+        <div class="menu-content-group">
+          <input type="button" data-shape="tetrahedron" data-direction="up"
+            class="menu-content-button-group direction-input" value="UP" />
+          <input type="button" data-shape="tetrahedron" data-direction="down"
+            class="menu-content-button-group direction-input" value="DOWN" />
+          <input type="button" data-shape="tetrahedron" data-direction="left"
+            class="menu-content-button-group direction-input" value="LEFT" />
+          <input type="button" data-shape="tetrahedron" data-direction="right"
+            class="menu-content-button-group direction-input" value="RIGHT" /><br />
+          <input type="button" data-shape="tetrahedron" class="menu-content-start-stop-group animation-input"
+            value="START" /><br />
+          <select name="texture" data-shape="tetrahedron" class="menu-content-dropdown-group texture-input">
+            <option value="0">Silver</option>
+            <option value="1">Earth</option>
+            <option value="2">USM</option>
+            <option value="3">Charmander</option>
+            <option value="4">Chikorita</option>
+            <option value="5">Totodile</option>
+          </select>
+        </div>
+        <div class="menu-content-title">Ambient Light</div>
+        <div class="menu-content-group">
+          <label for="ambient-reflection" class="menu-content-label-group">Ambient Reflection</label><br />
+          <input type="range" name="ambient-reflection" data-light="ambient"
+            class="menu-content-slider-group light-input" min="0.0" max="1.0" step="0.1" value="0.5" />
+          <input type="text" data-light="ambient" class="textbox light-output" value="0.5" readonly /><br />
+          <label for="ambient-color" class="menu-content-label-group">Ambient Colour</label><br />
+          <input type="color" data-material="ambient" class="menu-content-colorpicker-group material-input"
+            name="ambient-color" value="#ffffff" />
+        </div>
+        <div class="menu-content-title">Diffuse Light</div>
+        <div class="menu-content-group">
+          <label for="diffuse-reflection" class="menu-content-label-group">Diffuse Reflection</label><br />
+          <input type="range" name="diffuse-reflection" data-light="diffuse"
+            class="menu-content-slider-group light-input" min="0.0" max="1.0" step="0.1" value="0.5" />
+          <input type="text" data-light="diffuse" class="textbox light-output" value="0.5" readonly /><br />
+          <label for="diffuse-color" class="menu-content-label-group">Diffuse Colour</label><br />
+          <input type="color" data-material="diffuse" class="menu-content-colorpicker-group material-input"
+            name="diffuse-color" value="#ffffff" />
+        </div>
+        <div class="menu-content-title">Specular Light</div>
+        <div class="menu-content-group">
+          <label for="specular-reflection" class="menu-content-label-group">Specular Reflection</label><br />
+          <input type="range" name="specular-reflection" data-light="specular"
+            class="menu-content-slider-group light-input" min="0.0" max="1.0" step="0.1" value="0.5" />
+          <input type="text" data-light="specular" class="textbox light-output" value="0.5" readonly /><br />
+          <label for="specular-color" class="menu-content-label-group">Specular Colour</label><br />
+          <input type="color" data-material="specular" class="menu-content-colorpicker-group material-input"
+            name="specular-color" value="#ffffff" />
+        </div>
+        <div class="menu-content-title">Material Shininess</div>
+        <div class="menu-content-group">
+          <label for="shininess-reflection" class="menu-content-label-group">Shininess</label><br />
+          <input type="range" name="shininess-reflection" id="shininess-input" class="menu-content-slider-group"
+            min="10.0" max="100.0" step="10.0" value="50.0" />
+          <input type="text" id="shininess-output" class="textbox" value="50" readonly />
+        </div>
+        <div class="menu-content-title">Light Position</div>
+        <div class="menu-content-group">
+          <label for="x" class="menu-content-label-group">X</label><br />
+          <input type="range" name="x" data-index="0" class="menu-content-slider-group light-position-input" min="-1.0"
+            max="1.0" step="0.1" value="0.0" />
+          <input type="text" data-index="0" class="textbox light-position-output" value="0.0" readonly /><br />
+          <label for="y" class="menu-content-label-group">Y</label><br />
+          <input type="range" name="y" data-index="1" class="menu-content-slider-group light-position-input" min="-1.0"
+            max="1.0" step="0.1" value="0.0" />
+          <input type="text" data-index="1" class="textbox light-position-output" value="0.0" readonly /><br />
+          <label for="z" class="menu-content-label-group">Z</label><br />
+          <input type="range" name="z" data-index="2" class="menu-content-slider-group light-position-input" min="-1.0"
+            max="1.0" step="0.1" value="0.0" />
+          <input type="text" data-index="2" class="textbox light-position-output" value="0.0" readonly />
+        </div>
+      </div>
+    </div>
+  </div>
+  <img src="img/silver.jpg" crossorigin="anonymous" hidden />
+  <img src="img/earth.jpg" crossorigin="anonymous" hidden />
+  <img src="img/usm.jpg" crossorigin="anonymous" hidden />
+  <img src="img/charmander.jpg" crossorigin="anonymous" hidden />
+  <img src="img/chikorita.jpg" crossorigin="anonymous" hidden />
+  <img src="img/totodile.jpg" crossorigin="anonymous" hidden />
+</body>
+
+</html>
